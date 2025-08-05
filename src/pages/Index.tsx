@@ -18,34 +18,37 @@ const Index = () => {
       {/* Hero Section */}
       <div className="min-h-screen relative overflow-hidden bg-white">
         {/* Navigation */}
-        <nav className="fixed top-0 left-0 right-0 z-50 px-8 bg-white shadow-lg">
+        <nav className="fixed top-0 left-0 right-0 z-50 px-8">
           <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
-            {/* Logo */}
-            <img src="/logo.png" alt="Steelworks Logo" className="hidden md:block h-8 w-auto ml-0" />
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex bg-white rounded-full px-8 py-4 items-center justify-between shadow-lg w-full">
+              {/* Logo */}
+              <img src="/logo.png" alt="Steelworks Logo" className="h-8 w-auto ml-0" />
             
-            {/* Navigation Links */}
-            <div className="hidden md:flex gap-8 text-gray-700 text-base">
-              <a href="#" className="hover:text-blue-600 transition-colors">Home</a>
-              <a href="#services" className="hover:text-blue-600 transition-colors">Services</a>
-              
-              <a href="#about" className="hover:text-blue-600 transition-colors">About</a>
-                              <a href="#faqs" className="hover:text-blue-600 transition-colors">FAQs</a>
-              <a href="#contact" className="hover:text-blue-600 transition-colors">Contact</a>
-            </div>
-            
-            {/* Contact Information */}
-            <div className="hidden lg:flex items-center gap-6 text-gray-700 text-sm">
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                <span>+91 9894429728</span>
+              {/* Navigation Links */}
+              <div className="flex gap-8 text-gray-700 text-base">
+                <a href="#" className="hover:text-blue-600 transition-colors">Home</a>
+                <a href="#services" className="hover:text-blue-600 transition-colors">Services</a>
+                
+                <a href="#about" className="hover:text-blue-600 transition-colors">About</a>
+                                <a href="#faqs" className="hover:text-blue-600 transition-colors">FAQs</a>
+                <a href="#contact" className="hover:text-blue-600 transition-colors">Contact</a>
               </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <span>aspire@aisgroup.net.in</span>
+              
+              {/* Contact Information */}
+              <div className="hidden lg:flex items-center gap-6 text-gray-700 text-sm">
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  <span>+91 9894429728</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span>aspire@aisgroup.net.in</span>
+                </div>
               </div>
             </div>
           </div>
@@ -67,14 +70,10 @@ const Index = () => {
             <div className="md:hidden mt-4 bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-black/10">
               <div className="flex flex-col space-y-4 text-black/80">
                 <a href="#" className="hover:text-black transition-colors">Home</a>
-                <a href="#about" className="hover:text-black transition-colors">About Us</a>
-                <a href="#projects" className="hover:text-black transition-colors">Project</a>
-                <a href="#" className="hover:text-black transition-colors">Pricing</a>
-                <a href="#" className="hover:text-black transition-colors">Gallery</a>
-                <a href="#blogs" className="hover:text-black transition-colors">Blog</a>
-                <Button className="bg-black border border-black border-[0.5px] text-white rounded-full mt-4 font-normal hover:bg-black hover:text-white hover:border-black">
-                  <span className="mr-2 text-white text-xl align-middle">•</span>Contact Us
-                </Button>
+                <a href="#services" className="hover:text-black transition-colors">Services</a>
+                <a href="#about" className="hover:text-black transition-colors">About</a>
+                <a href="#faqs" className="hover:text-black transition-colors">FAQs</a>
+                <a href="#contact" className="hover:text-black transition-colors">Contact</a>
               </div>
             </div>
           )}
