@@ -113,6 +113,7 @@ const Index = () => {
                   <div className="flex justify-center">
                     <Button 
                       className="bg-white text-black hover:bg-white/90 rounded-xl px-8 py-4 text-base font-semibold shadow-lg"
+                      onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
                     >
                       Contact Us
                     </Button>
@@ -155,7 +156,10 @@ const Index = () => {
               </div>
               
               {/* CTA Button */}
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-8 py-3 text-base font-semibold">
+              <Button 
+                className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-8 py-3 text-base font-semibold"
+                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+              >
                 Let's Connect
               </Button>
             </div>
@@ -251,7 +255,10 @@ const Index = () => {
               <h2 className="text-4xl md:text-5xl font-light leading-tight text-blue-600">
                 Areas of Expertise
               </h2>
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-none px-6 py-2">
+              <Button 
+                className="bg-blue-500 hover:bg-blue-600 text-white rounded-none px-6 py-2"
+                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+              >
                Connect to Us
               </Button>
             </div>
@@ -466,7 +473,11 @@ Railway wagon loading/unloading, industrial painting, and civil support.
               <h2 className="text-4xl md:text-5xl font-light leading-tight">
                 Frequently Asked Questions
               </h2>
-              <Button variant="outline" className="border-black text-black hover:bg-black hover:text-white rounded-none px-6 py-2">
+              <Button 
+                variant="outline" 
+                className="border-black text-black hover:bg-black hover:text-white rounded-none px-6 py-2"
+                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+              >
                 Contact Us
               </Button>
             </div>
