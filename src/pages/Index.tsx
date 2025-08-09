@@ -1,17 +1,74 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Menu, X, ChevronDown, Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
+import { ArrowRight, Menu, X, ChevronDown, Facebook, Instagram, Twitter, Linkedin, Loader2 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import ProgressIndicator from "@/components/ProgressIndicator";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { contactFormSchema, type ContactFormData } from "@/lib/validations";
+import { sendContactEmail } from "@/lib/email";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 const Index = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  const form = useForm<ContactFormData>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      serviceRequired: "",
+      projectDetails: "",
+    },
+  });
 
+  const onSubmit = async (data: ContactFormData) => {
+    setIsSubmitting(true);
+    try {
+      await sendContactEmail(data);
+      toast.success("Message sent successfully! We'll get back to you soon.");
+      form.reset();
+    } catch (error) {
+      toast.error("Failed to send message. Please try again or contact us directly.");
+      console.error("Form submission error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Scroll to anchor when landing with hash or when hash changes
+  useEffect(() => {
+    const hash = location.hash || window.location.hash;
+    if (hash) {
+      const id = hash.replace('#', '');
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [location.hash]);
 
   return (
     <div className="min-h-screen font-sans">
@@ -25,12 +82,35 @@ const Index = () => {
               {/* Logo */}
               <img src="/logo.png" alt="Steelworks Logo" className="h-8 w-auto ml-0" />
             
-              {/* Navigation Links */}
+                            {/* Navigation Links */}
               <div className="flex gap-8 text-gray-700 text-base">
                 <a href="#" className="hover:text-blue-600 transition-colors">Home</a>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-1 hover:text-blue-600 transition-colors">
+                      About
+                      <ChevronDown className="h-4 w-4" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-48 bg-white border border-gray-200 shadow-lg">
+                    <DropdownMenuItem 
+                      className="hover:bg-blue-50 hover:text-blue-600 cursor-pointer"
+                      onClick={() => navigate('/vision-mission')}
+                    >
+                      Vision / Mission
+                    </DropdownMenuItem>
+
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <a href="#services" className="hover:text-blue-600 transition-colors">Services</a>
+                <button 
+                  onClick={() => navigate('/projects')}
+                  className="hover:text-blue-600 transition-colors"
+                >
+                  Projects
+                </button>
                 
-                <a href="#about" className="hover:text-blue-600 transition-colors">About</a>
+                
                                 <a href="#faqs" className="hover:text-blue-600 transition-colors">FAQs</a>
                 <a href="#contact" className="hover:text-blue-600 transition-colors">Contact</a>
               </div>
@@ -70,8 +150,26 @@ const Index = () => {
             <div className="md:hidden mt-4 bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-black/10">
               <div className="flex flex-col space-y-4 text-black/80">
                 <a href="#" className="hover:text-black transition-colors">Home</a>
+               
+                <div className="space-y-2">
+                  <div className="font-medium">About</div>
+                  <div className="ml-4 space-y-2">
+                    <button 
+                      onClick={() => navigate('/vision-mission')}
+                      className="block hover:text-blue-600 transition-colors text-left w-full"
+                    >
+                      Vision / Mission
+                    </button>
+
+                  </div>
+                </div>
                 <a href="#services" className="hover:text-black transition-colors">Services</a>
-                <a href="#about" className="hover:text-black transition-colors">About</a>
+                <button 
+                  onClick={() => navigate('/projects')}
+                  className="block hover:text-blue-600 transition-colors text-left w-full"
+                >
+                  Projects
+                </button>
                 <a href="#faqs" className="hover:text-black transition-colors">FAQs</a>
                 <a href="#contact" className="hover:text-black transition-colors">Contact</a>
               </div>
@@ -556,7 +654,7 @@ Railway wagon loading/unloading, industrial painting, and civil support.
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             {/* Left Side - Company Info */}
             <div>
-              <h3 className="text-2xl font-light mb-6" style={{fontFamily: 'Manrope, sans-serif'}}>Aspire Industrial Solutions LLP</h3>
+              <h3 className="text-2xl font-light mb-6 text-blue-500" style={{fontFamily: 'Manrope, sans-serif'}}>Aspire Industrial Solutions LLP</h3>
               <p className="text-white/80 mb-8 max-w-md font-light" style={{fontFamily: 'Manrope, sans-serif'}}>
                 ISO 9001:2015 certified company providing high-quality, safe, and cost-effective industrial services across the steel sector. With over 2000 professionals, we support leading steel industry clients.
               </p>
@@ -591,66 +689,152 @@ Dist- Salem, Tamilnadu, Pin – 636016</span>
 
             {/* Right Side - Contact Form */}
             <div>
-              <h3 className="text-2xl font-light mb-6" style={{fontFamily: 'Manrope, sans-serif'}}>Request Industrial Services</h3>
+              <h3 className="text-2xl font-light mb-6 text-blue-500" style={{fontFamily: 'Manrope, sans-serif'}}>Request Industrial Services</h3>
               <p className="text-white/80 mb-8 font-light" style={{fontFamily: 'Manrope, sans-serif'}}>
                 Get in touch with us for your steel plant operations, maintenance, and industrial support needs. Our expert team is ready to provide customized solutions.
               </p>
               
-              <form className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-white/80 text-sm mb-2 font-light" style={{fontFamily: 'Manrope, sans-serif'}}>First name</label>
-                    <Input 
-                      placeholder="Enter your name" 
-                      className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white/80 text-sm font-light" style={{fontFamily: 'Manrope, sans-serif'}}>
+                            First name
+                          </FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Enter your first name" 
+                              className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-red-300" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white/80 text-sm font-light" style={{fontFamily: 'Manrope, sans-serif'}}>
+                            Last name
+                          </FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Enter your last name" 
+                              className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-red-300" />
+                        </FormItem>
+                      )}
                     />
                   </div>
-                  <div>
-                    <label className="block text-white/80 text-sm mb-2 font-light" style={{fontFamily: 'Manrope, sans-serif'}}>Last name</label>
-                    <Input 
-                      placeholder="Enter your name" 
-                      className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white/80 text-sm font-light" style={{fontFamily: 'Manrope, sans-serif'}}>
+                            Phone number
+                          </FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Enter your phone number" 
+                              className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-red-300" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white/80 text-sm font-light" style={{fontFamily: 'Manrope, sans-serif'}}>
+                            Email
+                          </FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Enter your email address" 
+                              type="email"
+                              className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-red-300" />
+                        </FormItem>
+                      )}
                     />
                   </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-white/80 text-sm mb-2 font-light" style={{fontFamily: 'Manrope, sans-serif'}}>Phone number</label>
-                    <Input 
-                      placeholder="Enter your phone" 
-                      className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-white/80 text-sm mb-2 font-light" style={{fontFamily: 'Manrope, sans-serif'}}>Email</label>
-                    <Input 
-                      placeholder="Enter your email" 
-                      className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-white/80 text-sm mb-2 font-light" style={{fontFamily: 'Manrope, sans-serif'}}>Service required</label>
-                  <Input 
-                    placeholder="Coke Oven, Blast Furnace, Rolling Mills, etc." 
-                    className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
+                  
+                  <FormField
+                    control={form.control}
+                    name="serviceRequired"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white/80 text-sm font-light" style={{fontFamily: 'Manrope, sans-serif'}}>
+                          Service required
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Coke Oven, Blast Furnace, Rolling Mills, etc." 
+                            className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-300" />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                
-                <div>
-                  <label className="block text-white/80 text-sm mb-2 font-light" style={{fontFamily: 'Manrope, sans-serif'}}>Project details</label>
-                  <Textarea 
-                    placeholder="Describe your industrial requirements" 
-                    className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 min-h-[100px]"
+                  
+                  <FormField
+                    control={form.control}
+                    name="projectDetails"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white/80 text-sm font-light" style={{fontFamily: 'Manrope, sans-serif'}}>
+                          Project details
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Describe your industrial requirements" 
+                            className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 min-h-[100px]"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-300" />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                
-                <Button className="w-full bg-white text-black hover:bg-white/90 rounded-xl py-3 text-base font-semibold">
-                  Send Request
-                </Button>
-              </form>
+                  
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full bg-white text-black hover:bg-white/90 rounded-xl py-3 text-base font-semibold disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      'Send Request'
+                    )}
+                  </Button>
+                </form>
+              </Form>
             </div>
           </div>
           
