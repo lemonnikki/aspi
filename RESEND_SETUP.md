@@ -1,50 +1,92 @@
-# Contact Form Email Setup Instructions
+# Email Setup Guide 
 
-## ✅ Fixed Email Service Implementation!
-The contact form now uses **EmailJS** instead of Resend, which is compatible with client-side applications.
+This guide explains how to set up email functionality for the contact and career forms.
 
-## Current Status:
-- **Service**: EmailJS (browser-compatible)
-- **Mode**: Demo mode (logs form submissions to console)
-- **Contact Email**: `info@max-imo.com`
+## Current Issue
 
-## 🚀 Quick Test (Demo Mode):
-The form works immediately in demo mode:
-1. Fill out and submit the contact form
-2. Check the browser console to see the form data
-3. You'll see a success message
+The contact and career forms are not sending emails because:
+1. No valid Resend API key is configured
+2. Environment variables are missing
 
-## 📧 Setup Real Email Delivery (Optional):
+## Required Setup
 
-### Option 1: EmailJS (Recommended for Client-side)
-1. **Create Account**: Go to [https://www.emailjs.com](https://www.emailjs.com)
-2. **Get Credentials**: Create a service, template, and get your public key
-3. **Update Environment**: Add to `.env` file:
+### 1. Get a Resend API Key
+
+1. Go to [https://resend.com/](https://resend.com/)
+2. Sign up for a free account
+3. Navigate to the API Keys section
+4. Create a new API key
+5. Copy the API key (it will look like `re_xxxxxxxxxx`)
+
+### 2. Create Environment File
+
+Create a `.env.local` file in the root directory with the following content:
+
 ```env
-VITE_EMAILJS_SERVICE_ID=your_service_id
-VITE_EMAILJS_TEMPLATE_ID=your_template_id  
-VITE_EMAILJS_PUBLIC_KEY=your_public_key
+# Resend API Configuration
+RESEND_API_KEY=your_actual_resend_api_key_here
+
+# Email Configuration (optional - defaults provided)
+SENDER_EMAIL=onboarding@resend.dev
+CONTACT_EMAIL=info@max-imo.com
 ```
 
-### Option 2: Backend API (For Production)
-- Create a backend endpoint at `/api/send-email`
-- Use server-side email services (Resend, SendGrid, etc.)
-- The form will automatically try the backend first
+### 3. Configure Environment Variables
 
-## ✅ Current Features:
-- ✅ **Form validation** with error messages
-- ✅ **Loading states** during submission
-- ✅ **Success/error notifications**
-- ✅ **Demo mode** for immediate testing
-- ✅ **Browser compatible** email service
+Replace `your_actual_resend_api_key_here` with your actual Resend API key.
 
-## 6. Test the Form
-- Run the development server: `npm run dev`
-- Navigate to the contact form
-- Fill out and submit the form
-- Check your email and Resend dashboard for delivery status
+**Important:** 
+- Never commit the `.env.local` file to version control
+- The `.env.local` file should be added to `.gitignore`
 
-## Notes
-- The free tier includes 3,000 emails per month
-- You must verify your sending domain to avoid delivery issues
-- For production, consider setting up DKIM and SPF records
+### 4. Optional: Custom Domain Setup
+
+For production use, consider:
+
+1. **Custom Domain**: Set up a custom domain with Resend for better deliverability
+2. **Sender Email**: Change `SENDER_EMAIL` to use your domain (e.g., `noreply@max-imo.com`)
+3. **Contact Email**: Verify `CONTACT_EMAIL` is correct
+
+## Testing
+
+After setting up the environment variables:
+
+1. Restart your development server (`npm run dev`)
+2. Test the contact form at `/contact`
+3. Test the career form at `/careers`
+4. Check the browser console and server logs for any errors
+
+## Troubleshooting
+
+### Common Issues:
+
+1. **"Email service is not configured"** error:
+   - Check that `RESEND_API_KEY` is set in `.env.local`
+   - Restart the development server
+
+2. **401 Unauthorized** error:
+   - Verify your Resend API key is correct
+   - Check if the API key has expired
+
+3. **403 Forbidden** error:
+   - Your domain might not be verified with Resend
+   - Use the default `onboarding@resend.dev` sender for testing
+
+4. **Emails not received**:
+   - Check spam/junk folders
+   - Verify the `CONTACT_EMAIL` address
+   - Check Resend dashboard for delivery status
+
+## Current Configuration
+
+- **Resend Package**: Already installed (`resend: ^4.6.0`)
+- **API Routes**: Configured at `/api/contact` and `/api/careers`
+- **Error Handling**: Proper error messages and validation
+- **HTML Templates**: Rich email templates with styling
+
+## Next Steps
+
+1. Set up the environment variables as described above
+2. Test both forms thoroughly
+3. Consider setting up a custom domain for production
+4. Monitor email delivery through Resend dashboard

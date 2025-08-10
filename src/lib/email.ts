@@ -1,10 +1,12 @@
-import emailjs from '@emailjs/browser';
+import { Resend } from 'resend';
 import type { ContactFormData } from './validations';
 
-// Initialize EmailJS with your public key
-const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'demo_service';
-const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'demo_template';
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'demo_public_key';
+// Initialize Resend with API key
+const resend = new Resend(import.meta.env.VITE_RESEND_API_KEY || import.meta.env.RESEND_API_KEY);
+
+// Email configuration
+const SENDER_EMAIL = import.meta.env.VITE_SENDER_EMAIL || import.meta.env.SENDER_EMAIL || 'onboarding@resend.dev';
+const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL || import.meta.env.CONTACT_EMAIL || 'info@max-imo.com';
 
 export async function sendContactEmail(formData: ContactFormData) {
   console.log('Form submission started:', {
@@ -14,49 +16,12 @@ export async function sendContactEmail(formData: ContactFormData) {
   });
 
   try {
-    // Check if EmailJS is properly configured with real values
-    const hasEmailJSConfig = EMAILJS_PUBLIC_KEY !== 'demo_public_key' && 
-                              EMAILJS_SERVICE_ID !== 'demo_service' && 
-                              EMAILJS_TEMPLATE_ID !== 'demo_template' &&
-                              EMAILJS_PUBLIC_KEY.length > 10; // Real EmailJS keys are longer
+    // Check if Resend is properly configured
+    const hasResendConfig = import.meta.env.VITE_RESEND_API_KEY || import.meta.env.RESEND_API_KEY;
     
-    console.log('EmailJS configuration check:', {
-      serviceId: EMAILJS_SERVICE_ID,
-      templateId: EMAILJS_TEMPLATE_ID,
-      publicKeyPrefix: EMAILJS_PUBLIC_KEY.substring(0, 8),
-      isConfigured: hasEmailJSConfig
-    });
-    
-    if (hasEmailJSConfig) {
-      // Use EmailJS for actual email sending
-      const templateParams = {
-        from_name: `${formData.firstName} ${formData.lastName}`,
-        from_email: formData.email,
-        phone: formData.phone,
-        service_required: formData.serviceRequired,
-        project_details: formData.projectDetails,
-        to_email: 'aspire@aisgroup.net.in', // Replace with your email
-        reply_to: formData.email,
-      };
-
-      console.log('Sending email via EmailJS...');
+    if (!hasResendConfig) {
+      console.log('Resend API key not configured. Using demo mode...');
       
-      const result = await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        templateParams,
-        EMAILJS_PUBLIC_KEY
-      );
-
-      console.log('Email sent successfully via EmailJS:', result);
-      return { 
-        success: true, 
-        data: { 
-          id: result.text,
-          message: 'Email sent successfully!'
-        } 
-      };
-    } else {
       // Demo mode - simulate email sending
       console.log('Demo mode: Contact form submission', {
         from: formData.email,
@@ -65,7 +30,7 @@ export async function sendContactEmail(formData: ContactFormData) {
         service: formData.serviceRequired,
         details: formData.projectDetails,
         timestamp: new Date().toISOString(),
-        recipient: 'aspire@aisgroup.net.in'
+        recipient: CONTACT_EMAIL
       });
       
       // Simulate API delay
@@ -80,77 +45,109 @@ export async function sendContactEmail(formData: ContactFormData) {
       };
     }
 
-  } catch (error) {
-    console.error('Email sending error:', error);
+    // Use Resend for actual email sending
+    console.log('Sending email via Resend...');
     
-    // Check if this is an EmailJS configuration error (400 status)
-    if (error && typeof error === 'object' && 'status' in error) {
-      const emailjsError = error as { status: number; text?: string };
-      
-      if (emailjsError.status === 400) {
-        console.log('EmailJS configuration error detected. Falling back to demo mode...');
-        
-        // Fallback to demo mode for configuration errors
-        console.log('Fallback demo mode: Contact form submission', {
-          from: formData.email,
-          name: `${formData.firstName} ${formData.lastName}`,
-          phone: formData.phone,
-          service: formData.serviceRequired,
-          details: formData.projectDetails,
-          timestamp: new Date().toISOString(),
-          recipient: 'aspire@aisgroup.net.in',
-          note: 'EmailJS not configured - using demo mode'
-        });
-        
-        // Simulate processing
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        return { 
-          success: true, 
-          data: { 
-            id: `demo-fallback-${Date.now()}`,
-            message: 'Form submitted successfully! (Email service configuration needed for delivery)'
-          } 
-        };
-      }
+          const { data, error } = await resend.emails.send({
+        from: SENDER_EMAIL,
+        to: [CONTACT_EMAIL],
+        replyTo: formData.email,
+        subject: `New Contact Form Submission - ${formData.serviceRequired}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>New Contact Form Submission</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+            .field { margin-bottom: 15px; }
+            .label { font-weight: bold; color: #555; }
+            .value { background: #f8f9fa; padding: 10px; border-radius: 4px; margin-top: 5px; }
+            .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 14px; color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h2>New Contact Form Submission</h2>
+              <p>A new contact form has been submitted from your website.</p>
+            </div>
+            
+            <div class="field">
+              <div class="label">Name:</div>
+              <div class="value">${formData.firstName} ${formData.lastName}</div>
+            </div>
+            
+            <div class="field">
+              <div class="label">Email:</div>
+              <div class="value">${formData.email}</div>
+            </div>
+            
+            <div class="field">
+              <div class="label">Phone:</div>
+              <div class="value">${formData.phone}</div>
+            </div>
+            
+            <div class="field">
+              <div class="label">Service Required:</div>
+              <div class="value">${formData.serviceRequired}</div>
+            </div>
+            
+            <div class="field">
+              <div class="label">Project Details:</div>
+              <div class="value">${formData.projectDetails}</div>
+            </div>
+            
+            <div class="field">
+              <div class="label">Submission Time:</div>
+              <div class="value">${new Date().toLocaleString()}</div>
+            </div>
+            
+            <div class="footer">
+              <p>This email was sent from your website contact form.</p>
+              <p>You can reply directly to this email to contact the person who submitted the form.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    });
+
+    if (error) {
+      console.error('Resend API error:', error);
+      throw new Error(`Failed to send email: ${error.message}`);
     }
-    
-    // Handle other types of errors
-    if (error instanceof Error) {
-      if (error.message.includes('network') || error.message.includes('NetworkError')) {
-        throw new Error('Network error: Please check your internet connection and try again.');
-      } else {
-        // For any other error, fall back to demo mode rather than failing
-        console.log('Unexpected error, falling back to demo mode:', error);
-        
-        console.log('Error fallback demo mode: Contact form submission', {
-          from: formData.email,
-          name: `${formData.firstName} ${formData.lastName}`,
-          phone: formData.phone,
-          service: formData.serviceRequired,
-          details: formData.projectDetails,
-          timestamp: new Date().toISOString(),
-          recipient: 'aspire@aisgroup.net.in',
-          error: error.message
-        });
-        
-        return { 
-          success: true, 
-          data: { 
-            id: `error-fallback-${Date.now()}`,
-            message: 'Form submitted successfully! (Please contact us directly for immediate response)'
-          } 
-        };
-      }
-    }
-    
-    // Final fallback
+
+    console.log('Email sent successfully via Resend:', data);
     return { 
       success: true, 
       data: { 
-        id: `final-fallback-${Date.now()}`,
-        message: 'Form submitted successfully! (Please contact us directly)'
+        id: data?.id || 'unknown',
+        message: 'Email sent successfully!'
       } 
     };
+
+  } catch (error) {
+    console.error('Email sending error:', error);
+    
+    // Handle specific error types
+    if (error instanceof Error) {
+      if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+        throw new Error('Email service configuration error: Please check your API key.');
+      } else if (error.message.includes('403') || error.message.includes('Forbidden')) {
+        throw new Error('Email service access denied: Please verify your domain configuration.');
+      } else if (error.message.includes('network') || error.message.includes('NetworkError')) {
+        throw new Error('Network error: Please check your internet connection and try again.');
+      } else {
+        throw new Error(`Failed to send email: ${error.message}`);
+      }
+    }
+    
+    // Generic error fallback
+    throw new Error('Failed to send email: Unknown error occurred');
   }
 }
