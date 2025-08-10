@@ -8,30 +8,25 @@ export async function sendContactEmail(formData: ContactFormData) {
   });
 
   try {
-    // Demo mode - simulate email sending (client-side safe)
-    console.log('Demo mode: Contact form submission', {
-      from: formData.email,
-      name: `${formData.firstName} ${formData.lastName}`,
-      phone: formData.phone,
-      service: formData.serviceRequired,
-      details: formData.projectDetails,
-      timestamp: new Date().toISOString(),
-      recipient: 'aspire@aisgroup.net.in'
+    // Send request to API route
+    const response = await fetch('/api/contact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
     });
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    return { 
-      success: true, 
-      data: { 
-        id: `demo-${Date.now()}`,
-        message: 'Form submitted successfully (demo mode - check console for details)'
-      } 
-    };
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Failed to send email');
+    }
+
+    return result;
 
   } catch (error) {
     console.error('Email sending error:', error);
-    throw new Error('Failed to process form submission. Please try again.');
+    throw new Error(error instanceof Error ? error.message : 'Failed to process form submission. Please try again.');
   }
 }
