@@ -19,7 +19,7 @@ export default async function handler(req: any, res: any) {
     // Send email using Resend
     const { data, error } = await resend.emails.send({
       from: process.env.SENDER_EMAIL || 'onboarding@resend.dev',
-      to: [process.env.CONTACT_EMAIL || 'aspire@aisgroup.net.in'],
+      to: [process.env.CONTACT_EMAIL || 'lemonnikki11@gmail.com'],
       subject: `New Contact Form Submission - ${formData.serviceRequired}`,
       html: `
         <!DOCTYPE html>
